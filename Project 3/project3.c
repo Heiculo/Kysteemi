@@ -85,15 +85,37 @@ int main(int argc, char *argv[]){
     path[0] = strdup("/bin");
     path_count = 1;
 
+    // Setup for Interactive or Batch mode
+    int interactive = 1;
+    FILE *input = stdin;
+    if (argc == 1) {
+        interactive = 1;
+    } else if(argc == 2){
+        interactive = 0;
+        input = fopen(argv[1],"r");
+        if (input == NULL){
+            print_error();
+            exit(1);
+        }
+    } else {
+        print_error();
+        exit(1);
+    }
+
     char *line = NULL;
     size_t len = 0;
 
     while(1) {
-        printf("wish> ");
-        fflush(stdout);
+        // Print the prompt only in interactive mode
+        if (interactive){
+            printf("wish> ");
+            fflush(stdout);
+        }
 
-        if (getline(&line, &len, stdin) == -1){
+        ssize_t nread = getline(&line, &len, input);
+        if (nread == -1){
             free(line);
+            if (!interactive && input != stdin) fclose(input);
             exit(0); // The end of the command prompt
         }
 
@@ -255,6 +277,7 @@ int main(int argc, char *argv[]){
 
     free(line);
     for (int i = 0; i < path_count; i++) free(path[i]);
+    if (!interactive && input != stdin) fclose(input);
     
     return 0;
 }
