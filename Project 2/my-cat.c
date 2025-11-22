@@ -1,12 +1,13 @@
 // Eetu Heikurinen, 424495
 // 17.11.2025
+// Program that mimics Unix 'cat' command
 
 #include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char *argv[]){
-    // If there isn't any files, exit
 
+    // If there isn't any files, exit
     if (argc == 1){
         return 0;
     }
@@ -20,7 +21,9 @@ int main(int argc, char *argv[]){
             return 1;
         }
 
-        char buffer[4096]; // temporary storage for reading the data
+         // temporary storage for reading the data
+        char buffer[4096];
+        // Read the line line by line and print it out in stdout
         while (fgets(buffer, sizeof(buffer), fp) != NULL){
             printf("%s", buffer);
         }
