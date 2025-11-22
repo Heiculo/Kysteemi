@@ -1,5 +1,6 @@
 // Eetu Heikurinen, 424495
 // 17.11.2025
+// Program that mimics Unix 'unzip' command
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +20,7 @@ void decompress_file(FILE *fp){
 }
 
 int main(int argc, char *argv[]){
+    // Atleast one file is provided
     if (argc < 2) {
         printf("my-unzip: file1 [file2 ...]\n");
         return 1;
@@ -31,6 +33,7 @@ int main(int argc, char *argv[]){
                 printf("my-unzip: cannot open file\n");
                 return 1;
             }
+            
         decompress_file(fp);
         fclose(fp);
     }
