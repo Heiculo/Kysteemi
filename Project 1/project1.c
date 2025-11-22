@@ -1,5 +1,6 @@
 // Eetu Heikurinen, 424495
 // 10.11.2025
+// Program to reverse the lines of a input file or stdin
 
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -17,9 +18,11 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 
+    // No arguments: read the stdin, write to stdout
     if (argc == 1){
         in = stdin;
         out = stdout;
+    // One argument: Read from file, write to stdout
     } else if (argc == 2){
         in = fopen(argv[1], "r");
         if (!in){
@@ -27,11 +30,14 @@ int main(int argc, char *argv[]){
             exit(1);
         }
         out = stdout;
+    // Two arguments: Read from a file and write to a file
     } else if (argc == 3){
+        // Check that the filenames do not match
         if (strcmp(argv[1], argv[2]) == 0){
-            fprintf(stderr, "Input and output files have to be diffrent.\n");
+            fprintf(stderr, "Input and output files must differ.\n");
             exit(1);
         }
+        // Opening the files in correct mode (read and write)
         in = fopen(argv[1], "r");
          if (!in){
             fprintf(stderr, "error: cannot open file '%s'\n", argv[1]);
@@ -58,7 +64,9 @@ int main(int argc, char *argv[]){
     size_t len = 0;
     long read;
 
+    // Read each input line
     while ((read = getline(&line, &len, in)) != -1){
+
         if (count >= capacity) {
             capacity *= 2;
             char **new_lines = realloc(lines, capacity * sizeof(char *));
@@ -83,6 +91,8 @@ int main(int argc, char *argv[]){
         free(lines[i]);
     }
     free(lines);
+
+    // Close files if they were inputted
     if (in != stdin) fclose(in);
     if (out != stdout) fclose(out);
 
