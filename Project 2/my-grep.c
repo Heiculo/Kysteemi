@@ -1,18 +1,20 @@
 // Eetu Heikurinen, 424495
 // 17.11.2025
+// Program that mimics Unix 'grep' command
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// Searching for the term
+// Searching for the provided term
 int search_file(FILE *fp, const char *searcterm){
     char *line = NULL;
     size_t len = 0;
 
+    // Read the file line by line
     while (getline(&line, &len, fp) != -1){
         if(strstr(line, searcterm) != NULL){  // strstr() finds the substring in the line
-            printf("%s", line);
+            printf("%s", line); // Print the line if there's a match
         }
     }
 
@@ -42,6 +44,7 @@ int main (int argc, char *argv[]) {
                 return 1;
             }
 
+            // Search the current file
             search_file(fp, searcterm);
             printf("\n");
             fclose(fp);
