@@ -1,4 +1,4 @@
-Mini projects for the course "Operating Systems and System Programming" course
+Mini projects for the course "Operating Systems and System Programming" 
 
 Project 1: Warmup to C, Basic C program that reads data from an input file and then prints it out in a reverse.
 
