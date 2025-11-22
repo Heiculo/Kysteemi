@@ -1,5 +1,6 @@
 // Eetu Heikurinen, 424495
 // 17.11.2025
+// wish shell implementation
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,7 +21,7 @@ char error_message[30] = "An error has occurred\n";
 char *path[MAX_PATH];
 int path_count = 0;
 
-// Function for printing the error
+// Function for printing the error message
 void print_error(){
     write(STDERR_FILENO, error_message, strlen(error_message));
 }
@@ -34,6 +35,8 @@ pid_t execute_command(char ** args, char *redirect_file){
         
     } if (pid == 0){
         // Child process
+
+        // Handling the redirection if needed
         if (redirect_file != NULL){
             int fd = open(redirect_file, O_CREAT | O_WRONLY | O_TRUNC, 0666); // Give right access to the file
             if (fd < 0){
@@ -56,6 +59,7 @@ pid_t execute_command(char ** args, char *redirect_file){
             }
         }
 
+        // Command not found or execv failed
         print_error();
         exit(1);
     } 
@@ -63,7 +67,7 @@ pid_t execute_command(char ** args, char *redirect_file){
     return pid;
 }
 
-// Helper for trimming
+// Helper for trimming whitespaces
 
 char *trim(char *str){
     while (str != NULL && (*str == ' ' || *str == '\t')) str++;
@@ -167,7 +171,13 @@ int main(int argc, char *argv[]){
             trim(cmd_copy);
         }
 
-            // Tokenize inputs
+            // If there is a '#' treat it as a comment
+            char *hash = strchr(cmd_copy, '#');
+            if (hash) {
+                *hash = '\0'; // Cut off the comment
+            }
+
+            // Tokenize inputs into array
             char *args[MAX_ARGS];
             int arg_count = 0;
             char *token = strtok(cmd_copy, " \t");
@@ -178,7 +188,7 @@ int main(int argc, char *argv[]){
 
             args[arg_count] = NULL;
 
-            if(arg_count == 0) continue; // No command
+            if(arg_count == 0) continue; // No command --> skip
 
 
             // BUILT-IN COMMANDS
@@ -216,6 +226,19 @@ int main(int argc, char *argv[]){
                 continue;
             }
 
+            // wait
+            if(strcmp(args[0], "wait") == 0){
+                if (arg_count != 1){
+                    print_error();
+                    continue;
+                }
+                
+                // Waiting for all running children
+                while(wait(NULL) > 0);
+                continue;
+            }
+
+            // Executing external commands
             pid_t child = execute_command(args, redirect_file);
             if (child > 0 && pid_count < MAX_PARALLEL){
                 pids[pid_count++] = child;
@@ -229,7 +252,9 @@ int main(int argc, char *argv[]){
             waitpid(pids[i],NULL,0);
         }
     }
+
     free(line);
     for (int i = 0; i < path_count; i++) free(path[i]);
+    
     return 0;
 }
